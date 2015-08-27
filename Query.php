@@ -119,6 +119,7 @@ class Query
     /**
      * Pega todos os códigos SQL's executados durante o script. Cada posição do retorno conterá:
      *      [
+     *          'schema' => 'bancdo_de_dados', // Base de dados em que a query foi executada
      *          'dateTime' => 'Y-m-d H:i:s', // Data/Hora da execução
      *          'sql' => 'CODIGO SQL EXECUTADO JÁ COM PARAMETROS SUBSTITUIDOS', // Retornou erro?
      *          'lastId' => null, // Último id inserido em caso de INSERT ou REPLACE
@@ -176,6 +177,7 @@ class Query
 
         // Monta o Log
         self::$log[] = [
+            'schema' => self::$conn->getSchema(),
             'dateTime' => date( 'Y-m-d H:i:s' ),
             'sql' => $sql,
             'lastId' => $lastId,
