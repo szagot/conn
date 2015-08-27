@@ -21,7 +21,7 @@ use \PDOException,
 
 class Connection
 {
-    private $conn;
+    private $conn, $db;
 
     /**
      * Connection constructor.
@@ -34,6 +34,7 @@ class Connection
     public function __construct( $db, $host = 'localhost', $user = 'root', $pass = '' )
     {
         try {
+
             $this->conn = new PDO( "mysql:host={$host};dbname={$db};charset=utf8", $user, $pass, array(
                 // Garante a conversão par UTF-8
                 // É necessário que o banco de dados também seja criado com UTF-8 e cada tabela com COLLATE='utf8_general_ci'
@@ -44,6 +45,10 @@ class Connection
                 // Mantém aberta a Conexão com o Banco de Dados, se possível
                 PDO::ATTR_PERSISTENT => true
             ) );
+
+            // Salva o nome do BD conectado para posterior consulta de schema
+            $this->db = $db;
+
         } catch ( PDOException $err ) {
             die( "<meta name='erro_conexao' content='Erro ao conectar com o PDO: {$err->getMessage()}' />" );
         }
@@ -51,13 +56,31 @@ class Connection
     }
 
     /**
-     * Retorna a conexão
-     *
+     * Connection destructor
+     */
+    function __destruct()
+    {
+        // Desfaz a coneção com o PDO
+        $this->conn = null;
+    }
+
+
+    /**
+     * Pega o resultado da conexão
      * @return PDO
      */
     public function getConn()
     {
         return $this->conn;
+    }
+
+    /**
+     * Retorna o Schema (nome do BD) da conexão atual
+     * @return string
+     */
+    public function getSchema()
+    {
+        return $this->db;
     }
 
 

@@ -122,7 +122,7 @@ class Query
      *          'dateTime' => 'Y-m-d H:i:s', // Data/Hora da execução
      *          'sql' => 'CODIGO SQL EXECUTADO JÁ COM PARAMETROS SUBSTITUIDOS', // Retornou erro?
      *          'lastId' => null, // Último id inserido em caso de INSERT ou REPLACE
-     *          'rowsAffected' => 99, // Quantidade de linhas afetadas epla query
+     *          'rowsAffected' => 99, // Quantidade de linhas afetadas pela query
      *          'error' => true|false, // Houve erro nesta execução?
      *          'errorMsg' => 'Mensagem do Erro',
      *          // A seguir seguem os dados originais informados
