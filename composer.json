@@ -1,0 +1,14 @@
+{
+  "name": "szagot/conn",
+  "description": "Classes para Conexão e Consulta ao Banco de Dados",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Daniel Bispo",
+      "email": "szago@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0"
+  }
+}
