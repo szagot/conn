@@ -25,9 +25,7 @@ class Query
 {
     private static
         $conn,
-        $log = [ ],
-        $linhasAfetadas = 0,
-        $ultimoId;
+        $log = [ ];
 
     /**
      * Executa uma consulta ao Banco de Dados.
@@ -82,11 +80,12 @@ class Query
             $query->execute();
 
             // Número de Linhas Afetadas pela Query
-            self::$linhasAfetadas = $query->rowCount();
+            $rowsAffected = $query->rowCount();
 
             // Sendo um INSERT ou REPLACE, retorna o último ID inserido
+            $lastId = null;
             if ( preg_match( '/^[\n\r\s\t]*(insert|replace)/is', $sql ) )
-                self::$ultimoId = self::$conn->getConn()->lastInsertId();
+                $lastId = self::$conn->getConn()->lastInsertId();
 
         } catch ( PDOException $e ) {
 
@@ -95,7 +94,7 @@ class Query
         }
 
         // Cria o log da execução
-        self::makeLog( $sql, $params, $erro );
+        self::makeLog( $sql, $params, $lastId, $rowsAffected, $erro );
 
         if ( $erro )
             return false;
@@ -122,6 +121,8 @@ class Query
      *      [
      *          'dateTime' => 'Y-m-d H:i:s', // Data/Hora da execução
      *          'sql' => 'CODIGO SQL EXECUTADO JÁ COM PARAMETROS SUBSTITUIDOS', // Retornou erro?
+     *          'lastId' => null, // Último id inserido em caso de INSERT ou REPLACE
+     *          'rowsAffected' => 99, // Quantidade de linhas afetadas epla query
      *          'error' => true|false, // Houve erro nesta execução?
      *          'errorMsg' => 'Mensagem do Erro',
      *          // A seguir seguem os dados originais informados
@@ -143,13 +144,14 @@ class Query
     }
 
     /**
-     * Cria o log da execução
+     * Cria log de execução
      *
-     * @param $sql
-     * @param array $params
-     * @param string $erro
+     * @param string $sql Query executada
+     * @param null $lastId Último id inserido
+     * @param int $rowsAffected Quantidade de linhas afetadas
+     * @param string $error Erros
      */
-    private static function makeLog( $sql, $params = [ ], $erro = '' )
+    private static function makeLog( $sql, $params = [ ], $lastId = null, $rowsAffected = 0, $error = '' )
     {
         $sqlOriginal = $sql;
 
@@ -176,8 +178,10 @@ class Query
         self::$log[] = [
             'dateTime' => date( 'Y-m-d H:i:s' ),
             'sql' => $sql,
-            'error' => ! empty( $erro ),
-            'errorMsg' => $erro,
+            'lastId' => $lastId,
+            'rowsAffected' => $rowsAffected,
+            'error' => ! empty( $error ),
+            'errorMsg' => $error,
             'data' => [
                 'sql' => $sqlOriginal,
                 'params' => $params
