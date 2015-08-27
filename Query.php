@@ -192,7 +192,7 @@ class Query
     /**
      * Exec constructor.
      */
-    public function __construct()
+    private function __construct()
     {
         // Impede que a classe seja instanciada
     }
