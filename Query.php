@@ -53,8 +53,10 @@ class Query
         if ( ! self::$conn )
             die( "<meta name='erro_conexao' content='Efetue uma conexão primeiro' />" );
 
-        $erro = null;
-        $query = null;
+        $erro =
+        $query =
+        $lastId =
+        $rowsAffected = null;
         try {
             // Prepara a query
             $query = self::$conn->getConn()->prepare( $sql );
@@ -84,7 +86,6 @@ class Query
             $rowsAffected = $query->rowCount();
 
             // Sendo um INSERT ou REPLACE, retorna o último ID inserido
-            $lastId = null;
             if ( preg_match( '/^[\n\r\s\t]*(insert|replace)/is', $sql ) )
                 $lastId = self::$conn->getConn()->lastInsertId();
 
@@ -100,8 +101,8 @@ class Query
         if ( $erro )
             return false;
 
-        // Retorno em um array associadtivo quando a Query for um SELECT
-        if ( preg_match( '/^[\n\r\s\t]*select/is', $sql ) )
+        // Retorno em um array associadtivo quando a Query for um SELECT ou um SHOW
+        if ( preg_match( '/^[\n\r\s\t]*(select|show)/is', $sql ) )
             return $query->fetchAll( PDO::FETCH_ASSOC );
 
         // Query executada
