@@ -8,10 +8,10 @@
  * $consulta1 = Query::exec('SELECT...', [], $bd1);
  * $consulta2 = Query::exec('SELECT...', [ 'campo1' => 'valor' ], $bd2);
  *
- * NOTA: Se houver erro na conexão (Connection não setado), o script será interrompido e o erro mostrado em uma tag META,
- * que é invisível ao usuário, sendo visível apenas no código da página
+ * NOTA: Se houver erro na conexão (Connection não setado), o script será interrompido e o erro mostrado em uma tag
+ * META, que é invisível ao usuário, sendo visível apenas no código da página
  *
- * @author Daniel Bispo <daniel@tmw.com.br>
+ * @author    Daniel Bispo <daniel@tmw.com.br>
  * @copyright Copyright (c) 2015, TMW E-commerce Solutions
  */
 
@@ -38,9 +38,10 @@ class Query
      * ATENÇÃO! É necessário que a conexão ao BD tenha sido informado em algum momento antes com self::setConn,
      * ou através do parametro $conn. Exemplo: Query::exec('SELECT ...', [], new Connection(...) );
      *
-     * @param string $sql Comando SQL
-     * @param array $params
+     * @param string          $sql  Comando SQL
+     * @param array           $params
      * @param Connection|null $conn Conexão da consulta, caso não tenha sido setada ainda
+     *
      * @return boolean|array Em caso de sucesso retorna TRUE ou um array associativo em caso de SELECT
      */
     public static function exec( $sql, $params = [ ], Connection $conn = null )
@@ -109,6 +110,7 @@ class Query
 
     /**
      * Seta a Conexão ao BD desejado. Só é necessário uma vez, a menos que deseje mudar o BD.
+     *
      * @param Connection $conn
      */
     public static function setConn( Connection $conn )
@@ -134,6 +136,7 @@ class Query
      *      ]
      *
      * @param boolean|false $apenasUltimo Apenas o último SQL deve ser retornado?
+     *
      * @return array|string
      */
     public static function getLog( $apenasUltimo = false )
@@ -147,10 +150,10 @@ class Query
     /**
      * Cria log de execução
      *
-     * @param string $sql Query executada
-     * @param null $lastId Último id inserido
-     * @param int $rowsAffected Quantidade de linhas afetadas
-     * @param string $error Erros
+     * @param string $sql          Query executada
+     * @param null   $lastId       Último id inserido
+     * @param int    $rowsAffected Quantidade de linhas afetadas
+     * @param string $error        Erros
      */
     private static function makeLog( $sql, $params = [ ], $lastId = null, $rowsAffected = 0, $error = '' )
     {
@@ -177,15 +180,15 @@ class Query
 
         // Monta o Log
         self::$log[] = [
-            'schema' => self::$conn->getSchema(),
-            'dateTime' => date( 'Y-m-d H:i:s' ),
-            'sql' => $sql,
-            'lastId' => $lastId,
+            'schema'       => self::$conn->getSchema(),
+            'dateTime'     => date( 'Y-m-d H:i:s' ),
+            'sql'          => $sql,
+            'lastId'       => $lastId,
             'rowsAffected' => $rowsAffected,
-            'error' => ! empty( $error ),
-            'errorMsg' => $error,
-            'data' => [
-                'sql' => $sqlOriginal,
+            'error'        => ! empty( $error ),
+            'errorMsg'     => $error,
+            'data'         => [
+                'sql'    => $sqlOriginal,
                 'params' => $params
             ]
         ];
