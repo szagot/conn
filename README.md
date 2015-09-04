@@ -20,7 +20,7 @@ Classes para Conexão e Consulta ao Banco de Dados MySQL
 ### Query
     
     // Seta a conexão para o script
-    Query::setConn( $conn );
+    Conn\Query::setConn( $conn );
     
     // Não conseguiu fazer o insert?
     if( ! Conn\Query::exec('INSERT tabela (campo1, campo2) VALUES (:campo1, :campo2)', ['campo1' => 'valor','campo2' => 25.99]))
