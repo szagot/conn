@@ -6,7 +6,7 @@ Classes para Conexão e Consulta ao Banco de Dados MySQL
 - <b>CreateTable</b>: Classe auxiliar para criação de tabelas (ainda em fase de testes)
 
 
-## Exemlos de uso
+## Exemplos de uso
 
 ### Connection
 
