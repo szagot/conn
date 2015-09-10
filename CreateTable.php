@@ -342,32 +342,27 @@ class CreateTable
         $fk = '';
         if ( count( $this->fKeys ) > 0 && $engine == self::ENGINE_INNODB )
             foreach ( $this->fKeys as $index => $fKey )
-                $fk = ",
-                    CONSTRAINT `FK_{$this->tableName}_{$index}`
-                    FOREIGN KEY (`{$fKey['field']}`)
-                    REFERENCES `{$fKey['tableFk']}` (`{$fKey['fieldFk']}`)
-                    ON UPDATE {$fKey['update']}
-                    ON DELETE {$fKey['delete']}
-                ";
+                $fk .= ", CONSTRAINT `FK_{$this->tableName}_{$index}` "
+                    . "FOREIGN KEY (`{$fKey['field']}`) "
+                    . "REFERENCES `{$fKey['tableFk']}` (`{$fKey['fieldFk']}`) "
+                    . "ON UPDATE {$fKey['update']} "
+                    . "ON DELETE {$fKey['delete']}";
 
         // Monta query
-        $query = "
-          CREATE TABLE `{$this->tableName}` (
-              {$fields}
-              {$pk}
-              {$keys}
-              {$fk}
-          ) COLLATE = '{$collate}' ENGINE = {$engine}
-        ";
+        $query = "CREATE TABLE `{$this->tableName}` ( {$fields} {$pk} {$keys} {$fk} ) COLLATE = '{$collate}' ENGINE = {$engine}";
 
         // Se a tabela existir, é porque setTable foi configurado para permitir deleção da tabela. Neste caso, tenta apagar
-        if ( $this->tableExists( $this->tableName ) )
+        if ( $this->tableExists( $this->tableName ) ) {
+            // Remove a checagem de chaves estrangeiras
+            Query::exec( 'SET FOREIGN_KEY_CHECKS=0' );
+            // Tenta excluir
             if ( ! Query::exec( "DROP TABLE `{$this->tableName}`" ) )
-                return 'Tabela existe e não foi possível apagar. Erro: ' . Query::getLog( true )[ 'errorMsg' ];
+                return "A tabela {$this->tableName} existe e não foi possível apagar. Erro: " . Query::getLog( true )[ 'errorMsg' ];
+        }
 
         // Tenta criar a tabela
         if ( ! Query::exec( $query ) )
-            return 'Não foi possível criar a tabela. Erro: ' . Query::getLog( true )[ 'errorMsg' ];
+            return "Não foi possível criar a tabela {$this->tableName}. Erro: " . Query::getLog( true )[ 'errorMsg' ];
 
         return true;
     }
