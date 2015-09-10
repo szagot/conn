@@ -292,20 +292,22 @@ class CreateTable
      *
      * @param string $collate Formato do texto, colação da tabela
      * @param string $engine  Motor da tabela.
+     *
+     * @return string|boolean Retorna TRUE em caso de sucesso ou uma mensagem de erro em caso de falha.
      */
     public function create( $collate = self::COLLATE_UTF8, $engine = self::ENGINE_INNODB )
     {
         // Tabela setada?
         if ( ! $this->validateName( $this->tableName ) )
-            die( '<b>Você precisa definir o nome da tabela a ser criada.</b><br>
-                Não use caracteres especiais, apenas letras, números, traços e underline,
-                e deve iniciar com uma letra.' );
+            return 'Você precisa definir o nome da tabela a ser criada. '
+            . 'Não use caracteres especiais, apenas letras, números, traços e underline, '
+            . 'e deve iniciar com uma letra.';
 
         // Pelo menos 1 campo foi setado?
         if ( count( $this->fields ) == 0 )
-            die( '<b>Você deve adicionar pelo menos 1 campo.</b><br>
-                Não use caracteres especiais, apenas letras, números, traços e underline,
-                e deve iniciar com uma letra.' );
+            return 'Você deve adicionar pelo menos 1 campo. '
+            . 'Não use caracteres especiais, apenas letras, números, traços e underline, '
+            . 'e deve iniciar com uma letra.';
 
         // Inser os campos
         $fields = '';
@@ -361,13 +363,36 @@ class CreateTable
         // Se a tabela existir, é porque setTable foi configurado para permitir deleção da tabela. Neste caso, tenta apagar
         if ( $this->tableExists( $this->tableName ) )
             if ( ! Query::exec( "DROP TABLE `{$this->tableName}`" ) )
-                die( '<b>Tabela existe e não foi possível apagar</b><br>Erro: ' . Query::getLog( true )[ 'errorMsg' ] );
+                return 'Tabela existe e não foi possível apagar. Erro: ' . Query::getLog( true )[ 'errorMsg' ];
 
         // Tenta criar a tabela
         if ( ! Query::exec( $query ) )
-            die( '<b>Não foi possível criar a tabela</b><br>Erro: ' . Query::getLog( true )[ 'errorMsg' ] );
+            return 'Não foi possível criar a tabela. Erro: ' . Query::getLog( true )[ 'errorMsg' ];
 
-        echo "<pre><code>- Tabela {$this->tableName} criada com sucesso!</code></pre>";
+        return true;
+    }
+
+    /**
+     * Verifica existência de tabela no BD
+     *
+     * @param string $tableName Nome da tabela
+     *
+     * @return bool
+     */
+    public function tableExists( $tableName )
+    {
+        // Efetua pesquisa em busca da tabela requisitada
+        $consulta = Query::exec( "
+          SELECT
+            COUNT(TABLE_NAME) AS `table`
+          FROM
+            INFORMATION_SCHEMA.TABLES
+          WHERE
+            TABLE_SCHEMA = '{$this->conn->getSchema()}' AND TABLE_NAME LIKE '{$tableName}'
+        " )[ 0 ];
+
+        // Tabela existe?
+        return (int) $consulta[ 'table' ] == 1;
     }
 
 
@@ -382,29 +407,6 @@ class CreateTable
     private function validateName( $name = '' )
     {
         return preg_match( '/^[a-z][a-z0-9_-]*$/i', $name );
-    }
-
-    /**
-     * Verifica existência de tabela no BD
-     *
-     * @param string $tableName Nome da tabela
-     *
-     * @return bool
-     */
-    private function tableExists( $tableName )
-    {
-        // Efetua pesquisa em busca da tabela requisitada
-        $consulta = Query::exec( "
-          SELECT
-            COUNT(TABLE_NAME) AS `table`
-          FROM
-            INFORMATION_SCHEMA.TABLES
-          WHERE
-            TABLE_SCHEMA = '{$this->conn->getSchema()}' AND TABLE_NAME LIKE '{$tableName}'
-        " )[ 0 ];
-
-        // Tabela existe?
-        return (int) $consulta[ 'table' ] == 1;
     }
 
     /**

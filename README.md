@@ -51,4 +51,8 @@ Classes para Conexão e Consulta ao Banco de Dados MySQL
     $tabela->setPrimaryKey( 'campo1', false );
     
     // Cria a tabela com collate UTF-8 e engine InnoDB
-    $tabela->create();
+    $retorno = $tabela->create();
+    
+    // Deu erro?
+    if( $retorno !== true )
+        echo $retorno;
