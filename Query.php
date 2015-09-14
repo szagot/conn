@@ -142,10 +142,7 @@ class Query
      */
     public static function getLog( $apenasUltimo = false )
     {
-        if ( $apenasUltimo )
-            return end( self::$log );
-
-        return self::$log;
+        return $apenasUltimo ? end( self::$log ) : self::$log;
     }
 
     /**
