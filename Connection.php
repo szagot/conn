@@ -10,8 +10,8 @@
  * NOTA: Se houver erro na conexão, o script será interrompido e o erro mostrado em uma tag META,
  * que é invisível ao usuário, sendo visível apenas no código da página
  *
- * @author    Daniel Bispo <daniel@tmw.com.br>
- * @copyright Copyright (c) 2015, TMW E-commerce Solutions
+ * @author    Daniel Bispo <szagot@gmail.com>
+ * @copyright Copyright (c) 2015
  */
 
 namespace Conn;

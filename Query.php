@@ -11,8 +11,8 @@
  * NOTA: Se houver erro na conexão (Connection não setado), o script será interrompido e o erro mostrado em uma tag
  * META, que é invisível ao usuário, sendo visível apenas no código da página
  *
- * @author    Daniel Bispo <daniel@tmw.com.br>
- * @copyright Copyright (c) 2015, TMW E-commerce Solutions
+ * @author    Daniel Bispo <szagot@gmail.com>
+ * @copyright Copyright (c) 2015
  */
 
 namespace Conn;
@@ -138,7 +138,7 @@ class Query
      *
      * @param boolean|false $apenasUltimo Apenas o último SQL deve ser retornado?
      *
-     * @return array|string
+     * @return array
      */
     public static function getLog( $apenasUltimo = false )
     {
