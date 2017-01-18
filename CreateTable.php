@@ -73,27 +73,31 @@ class CreateTable
         TYPE_ENUM = 'ENUM',
         TYPE_SET = 'SET';
 
+
+    /** @var Connection */
+    private $conn;
+
     private
-        $conn,
         $tableName = '',
-        $fields = [ ],
+        $fields = [],
         $primaryKey = '',
         $autoIncrement = true,
-        $indexKeys = [ ],
-        $uniqueKeys = [ ],
-        $fullTextKeys = [ ],
-        $fKeys = [ ];
+        $indexKeys = [],
+        $uniqueKeys = [],
+        $fullTextKeys = [],
+        $fKeys = [];
 
     /**
      * CreateTable constructor.
      *
      * @param Connection $conn Conexão com o BD
      */
-    public function __construct( Connection $conn = null )
+    public function __construct(Connection $conn = null)
     {
         // Conexão foi setada?
-        if ( $conn )
-            $this->setConn( $conn );
+        if ($conn) {
+            $this->setConn($conn);
+        }
     }
 
     /**
@@ -103,14 +107,15 @@ class CreateTable
      * @param string     $tableName Nome da Tabela
      * @param bool       $dropTable Se a tabela existir no BD, ela deve ser sobescrita?
      */
-    public function setConn( Connection $conn, $tableName = '', $dropTable = false )
+    public function setConn(Connection $conn, $tableName = '', $dropTable = false)
     {
         // Seta a base de dados para execução das query's
         $this->conn = $conn;
-        Query::setConn( $conn );
+        Query::setConn($conn);
 
-        if ( $this->validateName( $tableName ) )
-            $this->setTable( $tableName, $dropTable );
+        if ($this->validateName($tableName)) {
+            $this->setTable($tableName, $dropTable);
+        }
     }
 
     /**
@@ -123,15 +128,17 @@ class CreateTable
      *
      * @return bool Tabela adicionada?
      */
-    public function setTable( $tableName, $dropTable = false )
+    public function setTable($tableName, $dropTable = false)
     {
         // Está dentro dos padrões o nome da tabela?
-        if ( ! $this->validateName( $tableName ) )
+        if (! $this->validateName($tableName)) {
             return false;
+        }
 
         // Se a tabela já existir no banco de dados, não autoriza a inserção, a menos que se queira excluí-la
-        if ( $this->tableExists( $tableName ) && ! $dropTable )
+        if ($this->tableExists($tableName) && ! $dropTable) {
             return false;
+        }
 
         // Adiciona a tabela ao motor
         $this->tableName = $tableName;
@@ -150,16 +157,17 @@ class CreateTable
      *
      * @return bool
      */
-    public function addField( $fieldName, $type = self::TYPE_INT, $len = null, $defaultValue = null )
+    public function addField($fieldName, $type = self::TYPE_INT, $len = null, $defaultValue = null)
     {
         // Está dentro dos padrões o nome do campo?
-        if ( ! $this->validateName( $fieldName ) )
+        if (! $this->validateName($fieldName)) {
             return false;
+        }
 
         // Adicionando o campo
         $this->fields[ $fieldName ] = [
             // Tipo + Tamanho do campo, se aplicável
-            'type'         => $type . ( preg_match( '/^[1-9][0-9,]*$/', $len ) ? "($len)" : '' ),
+            'type'         => $type . (preg_match('/^[1-9][0-9,]*$/', $len) ? "($len)" : ''),
             'defaultValue' => $defaultValue
         ];
 
@@ -174,11 +182,12 @@ class CreateTable
      *
      * @return bool
      */
-    public function setPrimaryKey( $fieldName, $autoIncrement = true )
+    public function setPrimaryKey($fieldName, $autoIncrement = true)
     {
         // Verifica se o campo foi setado
-        if ( ! array_key_exists( $fieldName, $this->fields ) )
+        if (! array_key_exists($fieldName, $this->fields)) {
             return false;
+        }
 
         $this->primaryKey = $fieldName;
         $this->autoIncrement = $autoIncrement;
@@ -193,15 +202,17 @@ class CreateTable
      *
      * @return bool
      */
-    public function addKey( $fieldName )
+    public function addKey($fieldName)
     {
         // Verifica se o campo foi setado
-        if ( ! array_key_exists( $fieldName, $this->fields ) )
+        if (! array_key_exists($fieldName, $this->fields)) {
             return false;
+        }
 
         // Se já foi adicionado, não adiciona novamente
-        if ( in_array( $fieldName, $this->indexKeys ) )
+        if (in_array($fieldName, $this->indexKeys)) {
             return true;
+        }
 
         $this->indexKeys[] = $fieldName;
 
@@ -215,15 +226,17 @@ class CreateTable
      *
      * @return bool
      */
-    public function addUniqueKey( $fieldName )
+    public function addUniqueKey($fieldName)
     {
         // Verifica se o campo foi setado
-        if ( ! array_key_exists( $fieldName, $this->fields ) )
+        if (! array_key_exists($fieldName, $this->fields)) {
             return false;
+        }
 
         // Se já foi adicionado, não adiciona novamente
-        if ( in_array( $fieldName, $this->uniqueKeys ) )
+        if (in_array($fieldName, $this->uniqueKeys)) {
             return true;
+        }
 
         $this->uniqueKeys[] = $fieldName;
 
@@ -237,15 +250,17 @@ class CreateTable
      *
      * @return bool
      */
-    public function addFullTextKey( $fieldName )
+    public function addFullTextKey($fieldName)
     {
         // Verifica se o campo foi setado
-        if ( ! array_key_exists( $fieldName, $this->fields ) )
+        if (! array_key_exists($fieldName, $this->fields)) {
             return false;
+        }
 
         // Se já foi adicionado, não adiciona novamente
-        if ( in_array( $fieldName, $this->fullTextKeys ) )
+        if (in_array($fieldName, $this->fullTextKeys)) {
             return true;
+        }
 
         $this->fullTextKeys[] = $fieldName;
 
@@ -263,18 +278,20 @@ class CreateTable
      *
      * @return boolean Chave criada?
      */
-    public function addFk( $fieldName, $tableFk, $fieldFk, $delete = self::FK_RESTRICT, $update = self::FK_RESTRICT )
+    public function addFk($fieldName, $tableFk, $fieldFk, $delete = self::FK_RESTRICT, $update = self::FK_RESTRICT)
     {
         // Verifica se o campo foi setado e se o campo estrangeiro passa nos padrões
-        if ( ! array_key_exists( $fieldName, $this->fields ) )
+        if (! array_key_exists($fieldName, $this->fields)) {
             return false;
+        }
 
         // Tabela/Campo externa existem?
-        if ( ! $this->fieldExists( $tableFk, $fieldFk ) )
+        if (! $this->fieldExists($tableFk, $fieldFk)) {
             return false;
+        }
 
         // Adiciona a chave ao campo estrangeiro
-        $this->addKey( $fieldName );
+        $this->addKey($fieldName);
         $this->fKeys[] = [
             'field'   => $fieldName,
             'tableFk' => $tableFk,
@@ -295,74 +312,88 @@ class CreateTable
      *
      * @return string|boolean Retorna TRUE em caso de sucesso ou uma mensagem de erro em caso de falha.
      */
-    public function create( $collate = self::COLLATE_UTF8, $engine = self::ENGINE_INNODB )
+    public function create($collate = self::COLLATE_UTF8, $engine = self::ENGINE_INNODB)
     {
         // Tabela setada?
-        if ( ! $this->validateName( $this->tableName ) )
+        if (! $this->validateName($this->tableName)) {
             return 'Você precisa definir o nome da tabela a ser criada. '
-            . 'Não use caracteres especiais, apenas letras, números, traços e underline, '
-            . 'e deve iniciar com uma letra.';
+                . 'Não use caracteres especiais, apenas letras, números, traços e underline, '
+                . 'e deve iniciar com uma letra.';
+        }
 
         // Pelo menos 1 campo foi setado?
-        if ( count( $this->fields ) == 0 )
+        if (count($this->fields) == 0) {
             return 'Você deve adicionar pelo menos 1 campo. '
-            . 'Não use caracteres especiais, apenas letras, números, traços e underline, '
-            . 'e deve iniciar com uma letra.';
+                . 'Não use caracteres especiais, apenas letras, números, traços e underline, '
+                . 'e deve iniciar com uma letra.';
+        }
 
         // Inser os campos
         $fields = '';
-        foreach ( $this->fields as $fieldName => $data )
-            $fields .= ( $fields == '' ? '' : ', ' )
+        foreach ($this->fields as $fieldName => $data) {
+            $fields .= ($fields == '' ? '' : ', ')
                 . " `{$fieldName}` {$data['type']}"
-                . ( ( $this->primaryKey == $fieldName )
-                    ? ( ' NOT NULL' . ( $this->autoIncrement ? ' AUTO_INCREMENT' : '' ) )
-                    : ( empty( $data[ 'defaultValue' ] ) ? ' NULL' : " NOT NULL DEFAULT '{$data[ 'defaultValue' ]}'" ) );
+                . (($this->primaryKey == $fieldName)
+                    ? (' NOT NULL' . ($this->autoIncrement ? ' AUTO_INCREMENT' : ''))
+                    : (empty($data[ 'defaultValue' ]) ? ' NULL' : " NOT NULL DEFAULT '{$data[ 'defaultValue' ]}'"));
+        }
 
         // Define a primary key
         $pk = '';
-        if ( ! empty( $this->primaryKey ) )
+        if (! empty($this->primaryKey)) {
             $pk = ", PRIMARY KEY (`{$this->primaryKey}`)";
+        }
 
         // Define as chaves
         $keys = '';
         // Index
-        if ( count( $this->indexKeys ) )
-            foreach ( $this->indexKeys as $key )
+        if (count($this->indexKeys)) {
+            foreach ($this->indexKeys as $key) {
                 $keys .= ", INDEX `$key` (`$key`)";
+            }
+        }
         // Unique
-        if ( count( $this->uniqueKeys ) )
-            foreach ( $this->uniqueKeys as $key )
+        if (count($this->uniqueKeys)) {
+            foreach ($this->uniqueKeys as $key) {
                 $keys .= ", UNIQUE INDEX `$key` (`$key`)";
+            }
+        }
         // Fulltext
-        if ( count( $this->fullTextKeys ) )
-            foreach ( $this->fullTextKeys as $key )
+        if (count($this->fullTextKeys)) {
+            foreach ($this->fullTextKeys as $key) {
                 $keys .= ", FULLTEXT INDEX `$key` (`$key`)";
+            }
+        }
 
         // Define as chaves estrangeiras
         $fk = '';
-        if ( count( $this->fKeys ) > 0 && $engine == self::ENGINE_INNODB )
-            foreach ( $this->fKeys as $index => $fKey )
+        if (count($this->fKeys) > 0 && $engine == self::ENGINE_INNODB) {
+            foreach ($this->fKeys as $index => $fKey) {
                 $fk .= ", CONSTRAINT `FK_{$this->tableName}_{$index}` "
                     . "FOREIGN KEY (`{$fKey['field']}`) "
                     . "REFERENCES `{$fKey['tableFk']}` (`{$fKey['fieldFk']}`) "
                     . "ON UPDATE {$fKey['update']} "
                     . "ON DELETE {$fKey['delete']}";
+            }
+        }
 
         // Monta query
         $query = "CREATE TABLE `{$this->tableName}` ( {$fields} {$pk} {$keys} {$fk} ) COLLATE = '{$collate}' ENGINE = {$engine}";
 
         // Se a tabela existir, é porque setTable foi configurado para permitir deleção da tabela. Neste caso, tenta apagar
-        if ( $this->tableExists( $this->tableName ) ) {
+        if ($this->tableExists($this->tableName)) {
             // Remove a checagem de chaves estrangeiras
-            Query::exec( 'SET FOREIGN_KEY_CHECKS=0' );
+            Query::exec('SET FOREIGN_KEY_CHECKS=0');
             // Tenta excluir
-            if ( ! Query::exec( "DROP TABLE `{$this->tableName}`" ) )
-                return "A tabela {$this->tableName} existe e não foi possível apagar. Erro: " . Query::getLog( true )[ 'errorMsg' ];
+            if (! Query::exec("DROP TABLE `{$this->tableName}`")) {
+                return "A tabela {$this->tableName} existe e não foi possível apagar. Erro: " . Query::getLog(true)[ 'errorMsg' ];
+            }
         }
 
         // Tenta criar a tabela
-        if ( ! Query::exec( $query ) )
-            return "Não foi possível criar a tabela {$this->tableName}. Erro: " . Query::getLog( true )[ 'errorMsg' ];
+        if (! Query::exec($query)) {
+            return "Não foi possível criar a tabela {$this->tableName}. Erro: " . Query::getLog(true)[ 'errorMsg' ];
+        }
 
         return true;
     }
@@ -374,20 +405,20 @@ class CreateTable
      *
      * @return bool
      */
-    public function tableExists( $tableName )
+    public function tableExists($tableName)
     {
         // Efetua pesquisa em busca da tabela requisitada
-        $consulta = Query::exec( "
+        $consulta = Query::exec("
           SELECT
             COUNT(TABLE_NAME) AS `table`
           FROM
             INFORMATION_SCHEMA.TABLES
           WHERE
             TABLE_SCHEMA = '{$this->conn->getSchema()}' AND TABLE_NAME LIKE '{$tableName}'
-        " )[ 0 ];
+        ")[ 0 ];
 
         // Tabela existe?
-        return (int) $consulta[ 'table' ] == 1;
+        return (int)$consulta[ 'table' ] == 1;
     }
 
 
@@ -399,9 +430,9 @@ class CreateTable
      *
      * @return boolean
      */
-    private function validateName( $name = '' )
+    private function validateName($name = '')
     {
-        return preg_match( '/^[a-z][a-z0-9_-]*$/i', $name );
+        return preg_match('/^[a-z][a-z0-9_-]*$/i', $name);
     }
 
     /**
@@ -412,18 +443,19 @@ class CreateTable
      *
      * @return boolean Existe o campo?
      */
-    private function fieldExists( $tableName, $fieldName )
+    private function fieldExists($tableName, $fieldName)
     {
 
         // Os nomes passados estão no padrão?
-        if ( ! $this->validateName( $tableName ) || ! $this->validateName( $fieldName ) )
+        if (! $this->validateName($tableName) || ! $this->validateName($fieldName)) {
             return false;
+        }
 
         // Pesquisa o campo na tabela
-        $consulta = Query::exec( "SHOW COLUMNS FROM $tableName WHERE Field = '$fieldName'" );
+        $consulta = Query::exec("SHOW COLUMNS FROM $tableName WHERE Field = '$fieldName'");
 
         // O campo foi encontrado?
-        return isset( $consulta[ 0 ][ 'Field' ] );
+        return isset($consulta[ 0 ][ 'Field' ]);
 
     }
 

@@ -23,9 +23,9 @@ use
 
 class Query
 {
-    private static
-        $conn,
-        $log = [ ];
+    /** @var Connection */
+    private static $conn;
+    private static $log = [];
 
     /**
      * Executa uma consulta ao Banco de Dados.
@@ -44,14 +44,16 @@ class Query
      *
      * @return boolean|array Em caso de sucesso retorna TRUE ou um array associativo em caso de SELECT
      */
-    public static function exec( $sql, $params = [ ], Connection $conn = null )
+    public static function exec($sql, $params = [], Connection $conn = null)
     {
         // Conexão ao BD informado?
-        if ( $conn )
-            self::setConn( $conn );
+        if ($conn) {
+            self::setConn($conn);
+        }
 
-        if ( ! self::$conn )
-            die( "<meta name='erro_conexao' content='Efetue uma conexão primeiro' />" );
+        if (! self::$conn) {
+            die('Efetue uma conexão primeiro');
+        }
 
         $erro =
         $query =
@@ -59,25 +61,28 @@ class Query
         $rowsAffected = null;
         try {
             // Prepara a query
-            $query = self::$conn->getConn()->prepare( $sql );
+            $query = self::$conn->getConn()->prepare($sql);
 
-            if ( count( $params ) > 0 )
-                foreach ( $params as $campo => $valor )
-                    // É nulo?
-                    if ( is_null( $valor ) )
-                        $query->bindValue( ':' . $campo, null, PDO::PARAM_NULL );
-                    // O valor é booleano?
-                    elseif ( is_bool( $valor ) )
-                        $query->bindValue( ':' . $campo, $valor, PDO::PARAM_BOOL );
-                    // O valor é inteiro?
-                    elseif ( is_int( $valor ) )
-                        $query->bindValue( ':' . $campo, $valor, PDO::PARAM_INT );
-                    // É string, mas permite HTML? (Ou seja, tem * no campo)
-                    elseif ( preg_match( '/\*$/', $campo ) )
-                        $query->bindValue( ':' . str_replace( '*', '', $campo ), $valor, PDO::PARAM_STR );
-                    // É apenas string?
-                    else
-                        $query->bindValue( ':' . $campo, strip_tags( trim( $valor ) ), PDO::PARAM_STR );
+            if (count($params) > 0) {
+                foreach ($params as $campo => $valor) {
+                    // É nulo ou está vazio?
+                    if (empty($valor)) {
+                        $query->bindValue(':' . $campo, null, PDO::PARAM_NULL);
+                    } // O valor é booleano?
+                    elseif (is_bool($valor)) {
+                        $query->bindValue(':' . $campo, $valor, PDO::PARAM_BOOL);
+                    } // O valor é inteiro?
+                    elseif (is_int($valor)) {
+                        $query->bindValue(':' . $campo, $valor, PDO::PARAM_INT);
+                    } // É string, mas permite HTML? (Ou seja, tem * no campo)
+                    elseif (preg_match('/\*$/', $campo)) {
+                        $query->bindValue(':' . str_replace('*', '', $campo), $valor, PDO::PARAM_STR);
+                    } // É apenas string?
+                    else {
+                        $query->bindValue(':' . $campo, strip_tags(trim($valor)), PDO::PARAM_STR);
+                    }
+                }
+            }
 
             // Executa a query
             $query->execute();
@@ -86,24 +91,27 @@ class Query
             $rowsAffected = $query->rowCount();
 
             // Sendo um INSERT ou REPLACE, retorna o último ID inserido
-            if ( preg_match( '/^[\n\r\s\t]*(insert|replace)/is', $sql ) )
+            if (preg_match('/^[\n\r\s\t]*(insert|replace)/is', $sql)) {
                 $lastId = self::$conn->getConn()->lastInsertId();
+            }
 
-        } catch ( PDOException $e ) {
+        } catch (PDOException $e) {
 
             $erro = $e->getMessage();
 
         }
 
         // Cria o log da execução
-        self::makeLog( $sql, $params, $lastId, $rowsAffected, $erro );
+        self::makeLog($sql, $params, $lastId, $rowsAffected, $erro);
 
-        if ( $erro )
+        if ($erro) {
             return false;
+        }
 
         // Retorno em um array associadtivo quando a Query for um SELECT ou um SHOW
-        if ( preg_match( '/^[\n\r\s\t]*(select|show)/is', $sql ) )
-            return $query->fetchAll( PDO::FETCH_ASSOC );
+        if (preg_match('/^[\n\r\s\t]*(select|show)/is', $sql)) {
+            return $query->fetchAll(PDO::FETCH_ASSOC);
+        }
 
         // Query executada
         return true;
@@ -114,7 +122,7 @@ class Query
      *
      * @param Connection $conn
      */
-    public static function setConn( Connection $conn )
+    public static function setConn(Connection $conn)
     {
         self::$conn = $conn;
     }
@@ -140,9 +148,9 @@ class Query
      *
      * @return array
      */
-    public static function getLog( $apenasUltimo = false )
+    public static function getLog($apenasUltimo = false)
     {
-        return $apenasUltimo ? end( self::$log ) : self::$log;
+        return $apenasUltimo ? end(self::$log) : self::$log;
     }
 
     /**
@@ -153,37 +161,40 @@ class Query
      * @param int    $rowsAffected Quantidade de linhas afetadas
      * @param string $error        Erros
      */
-    private static function makeLog( $sql, $params = [ ], $lastId = null, $rowsAffected = 0, $error = '' )
+    private static function makeLog($sql, $params = [], $lastId = null, $rowsAffected = 0, $error = '')
     {
         $sqlOriginal = $sql;
 
         // Tem parametros?
-        if ( count( $params ) > 0 )
-            foreach ( $params as $campo => $valor )
-                // É nulo?
-                if ( is_null( $valor ) )
-                    $sql = str_replace( ':' . $campo, 'NULL', $sql );
-                // É vazio?
-                elseif ( empty( $valor ) )
-                    $sql = str_replace( ':' . $campo, '""', $sql );
-                // O valor é booleano ou numerico?
-                elseif ( is_bool( $valor ) || is_int( $valor ) )
-                    $sql = str_replace( ':' . $campo, $valor, $sql );
-                // É string, mas permite HTML? (Ou seja, tem * no campo)
-                elseif ( preg_match( '/\*$/', $campo ) )
-                    $sql = str_replace( ':' . str_replace( '*', '', $campo ), '"' . $valor . '"', $sql );
-                // É apenas string
-                else
-                    $sql = str_replace( ':' . $campo, '"' . strip_tags( trim( $valor ) ) . '"', $sql );
+        if (count($params) > 0) {
+            foreach ($params as $campo => $valor) // É nulo?
+            {
+                if (is_null($valor)) {
+                    $sql = str_replace(':' . $campo, 'NULL', $sql);
+                } // É vazio?
+                elseif (empty($valor)) {
+                    $sql = str_replace(':' . $campo, '""', $sql);
+                } // O valor é booleano ou numerico?
+                elseif (is_bool($valor) || is_int($valor)) {
+                    $sql = str_replace(':' . $campo, $valor, $sql);
+                } // É string, mas permite HTML? (Ou seja, tem * no campo)
+                elseif (preg_match('/\*$/', $campo)) {
+                    $sql = str_replace(':' . str_replace('*', '', $campo), '"' . $valor . '"', $sql);
+                } // É apenas string
+                else {
+                    $sql = str_replace(':' . $campo, '"' . strip_tags(trim($valor)) . '"', $sql);
+                }
+            }
+        }
 
         // Monta o Log
         self::$log[] = [
             'schema'       => self::$conn->getSchema(),
-            'dateTime'     => date( 'Y-m-d H:i:s' ),
+            'dateTime'     => date('Y-m-d H:i:s'),
             'sql'          => $sql,
             'lastId'       => $lastId,
             'rowsAffected' => $rowsAffected,
-            'error'        => ! empty( $error ),
+            'error'        => ! empty($error),
             'errorMsg'     => $error,
             'data'         => [
                 'sql'    => $sqlOriginal,
