@@ -14,7 +14,7 @@
  * @copyright Copyright (c) 2015
  */
 
-namespace Conn;
+namespace Sz\Conn;
 
 use \PDOException,
     \PDO;

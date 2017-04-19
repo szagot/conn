@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2015
  */
 
-namespace Conn;
+namespace Sz\Conn;
 
 class CreateTable
 {
