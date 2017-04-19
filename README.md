@@ -8,7 +8,7 @@ Classes para Conexão e Consulta ao Banco de Dados MySQL
 
 ## Exemplos de uso
 
-    use Conn;
+    use Sz\Conn;
 
 ### Connection
 
