@@ -38,20 +38,15 @@ class Query
      * ATENÇÃO! É necessário que a conexão ao BD tenha sido informado em algum momento antes com self::setConn,
      * ou através do parametro $conn. Exemplo: Query::exec('SELECT ...', [], new Connection(...) );
      *
-     * @param string          $sql  Comando SQL
-     * @param array           $params
-     * @param Connection|null $conn Conexão da consulta, caso não tenha sido setada ainda
+     * @param string $sql   Comando SQL
+     * @param array  $params
+     * @param string $class Classe associada
      *
      * @return boolean|array Em caso de sucesso retorna TRUE ou um array associativo em caso de SELECT
      */
-    public static function exec($sql, $params = [], Connection $conn = null)
+    public static function exec($sql, $params = [], $class = null)
     {
-        // Conexão ao BD informado?
-        if ($conn) {
-            self::setConn($conn);
-        }
-
-        if (! self::$conn) {
+        if (!self::$conn) {
             die('Efetue uma conexão primeiro');
         }
 
@@ -110,7 +105,9 @@ class Query
 
         // Retorno em um array associadtivo quando a Query for um SELECT ou um SHOW
         if (preg_match('/^[\n\r\s\t]*(select|show)/is', $sql)) {
-            return $query->fetchAll(PDO::FETCH_ASSOC);
+            return empty($class)
+                ? $query->fetchAll(PDO::FETCH_ASSOC)
+                : $query->fetchAll(PDO::FETCH_CLASS, $class);
         }
 
         // Query executada
@@ -189,17 +186,17 @@ class Query
 
         // Monta o Log
         self::$log[] = [
-            'schema'       => self::$conn->getSchema(),
-            'dateTime'     => date('Y-m-d H:i:s'),
-            'sql'          => $sql,
-            'lastId'       => $lastId,
+            'schema' => self::$conn->getSchema(),
+            'dateTime' => date('Y-m-d H:i:s'),
+            'sql' => $sql,
+            'lastId' => $lastId,
             'rowsAffected' => $rowsAffected,
-            'error'        => ! empty($error),
-            'errorMsg'     => $error,
-            'data'         => [
-                'sql'    => $sqlOriginal,
-                'params' => $params
-            ]
+            'error' => !empty($error),
+            'errorMsg' => $error,
+            'data' => [
+                'sql' => $sqlOriginal,
+                'params' => $params,
+            ],
         ];
     }
 
