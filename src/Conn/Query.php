@@ -60,11 +60,11 @@ class Query
 
             if (count($params) > 0) {
                 foreach ($params as $campo => $valor) {
-                    // É nulo ou está vazio?
-                    if (empty($valor)) {
+                    // É nulo ou está vazio (menos para números e booleanos)?
+                    if (empty($valor) && $valor !== 0 && $valor !== false) {
                         $query->bindValue(':' . $campo, null, PDO::PARAM_NULL);
                     } // O valor é booleano?
-                    elseif (is_bool($valor)) {
+                    elseif (is_bool($valor) && $valor !== 0) {
                         $query->bindValue(':' . $campo, $valor, PDO::PARAM_BOOL);
                     } // O valor é inteiro?
                     elseif (is_int($valor)) {
@@ -186,15 +186,15 @@ class Query
 
         // Monta o Log
         self::$log[] = [
-            'schema' => self::$conn->getSchema(),
-            'dateTime' => date('Y-m-d H:i:s'),
-            'sql' => $sql,
-            'lastId' => $lastId,
+            'schema'       => self::$conn->getSchema(),
+            'dateTime'     => date('Y-m-d H:i:s'),
+            'sql'          => $sql,
+            'lastId'       => $lastId,
             'rowsAffected' => $rowsAffected,
-            'error' => !empty($error),
-            'errorMsg' => $error,
-            'data' => [
-                'sql' => $sqlOriginal,
+            'error'        => !empty($error),
+            'errorMsg'     => $error,
+            'data'         => [
+                'sql'    => $sqlOriginal,
                 'params' => $params,
             ],
         ];
