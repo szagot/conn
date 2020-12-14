@@ -28,6 +28,9 @@ Classes para Conexão e Consulta ao Banco de Dados MySQL
     if( ! Query::exec('INSERT tabela (campo1, campo2) VALUES (:campo1, :campo2)', ['campo1' => 'valor','campo2' => 25.99]))
         // Mostra o log de execução completo
         var_dump( Query::getLog() );
+    
+    // Pega o último ID inserido
+    $id = Query::getLog(true)['lastId'];
         
     // Efetua uma consulta
     $consulta = Query('SELECT * FROM tabela');
