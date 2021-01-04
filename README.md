@@ -16,7 +16,10 @@ Classes para Conexão e Consulta ao Banco de Dados MySQL
     $conn = new Connection( 'BD' );
 
     // Exemplo de  conexão externa
-    $conn = $conn = new Connection( 'BD', 'host', 'user', 'pass' );
+    $conn = new Connection( 'BD', 'host', 'user', 'pass' );
+    
+    // Obs: Para usar PostgreSQL, faça
+    $conn = new Connection( 'BD', 'host', 'user', 'pass', true );
 
     
 ### Query
