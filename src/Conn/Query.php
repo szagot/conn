@@ -58,7 +58,7 @@ class Query
             // Prepara a query
             $query = self::$conn->getConn()->prepare($sql);
 
-            if (count($params) > 0) {
+            if (!empty($params) && count($params) > 0) {
                 foreach ($params as $campo => $valor) {
                     // É nulo ou está vazio (menos para números e booleanos)?
                     if (empty($valor) && $valor !== 0 && $valor !== false) {
@@ -163,7 +163,7 @@ class Query
         $sqlOriginal = $sql;
 
         // Tem parametros?
-        if (count($params) > 0) {
+        if (!empty($params) && count($params) > 0) {
             foreach ($params as $campo => $valor) // É nulo?
             {
                 if (is_null($valor)) {
