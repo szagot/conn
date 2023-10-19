@@ -60,21 +60,22 @@ class Query
 
             if (!empty($params) && count($params) > 0) {
                 foreach ($params as $campo => $valor) {
+                    $campoTratado = str_replace('*', '', $campo);
                     // É nulo ou está vazio (menos para números e booleanos)?
                     if (empty($valor) && $valor !== 0 && $valor !== false) {
-                        $query->bindValue(':' . $campo, null, PDO::PARAM_NULL);
+                        $query->bindValue(':' . $campoTratado, null, PDO::PARAM_NULL);
                     } // O valor é booleano?
                     elseif (is_bool($valor) && $valor !== 0) {
-                        $query->bindValue(':' . $campo, $valor, PDO::PARAM_BOOL);
+                        $query->bindValue(':' . $campoTratado, $valor, PDO::PARAM_BOOL);
                     } // O valor é inteiro?
                     elseif (is_int($valor)) {
-                        $query->bindValue(':' . $campo, $valor, PDO::PARAM_INT);
+                        $query->bindValue(':' . $campoTratado, $valor, PDO::PARAM_INT);
                     } // É string, mas permite HTML? (Ou seja, tem * no campo)
                     elseif (preg_match('/\*$/', $campo)) {
-                        $query->bindValue(':' . str_replace('*', '', $campo), $valor, PDO::PARAM_STR);
+                        $query->bindValue(':' . $campoTratado, $valor, PDO::PARAM_STR);
                     } // É apenas string?
                     else {
-                        $query->bindValue(':' . $campo, strip_tags(trim($valor)), PDO::PARAM_STR);
+                        $query->bindValue(':' . $campoTratado, strip_tags(trim($valor)), PDO::PARAM_STR);
                     }
                 }
             }
@@ -186,15 +187,15 @@ class Query
 
         // Monta o Log
         self::$log[] = [
-            'schema'       => self::$conn->getSchema(),
-            'dateTime'     => date('Y-m-d H:i:s'),
-            'sql'          => $sql,
-            'lastId'       => $lastId,
+            'schema' => self::$conn->getSchema(),
+            'dateTime' => date('Y-m-d H:i:s'),
+            'sql' => $sql,
+            'lastId' => $lastId,
             'rowsAffected' => $rowsAffected,
-            'error'        => !empty($error),
-            'errorMsg'     => $error,
-            'data'         => [
-                'sql'    => $sqlOriginal,
+            'error' => !empty($error),
+            'errorMsg' => $error,
+            'data' => [
+                'sql' => $sqlOriginal,
                 'params' => $params,
             ],
         ];
