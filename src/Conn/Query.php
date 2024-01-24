@@ -104,8 +104,8 @@ class Query
             return false;
         }
 
-        // Retorno em um array associadtivo quando a Query for um SELECT ou um SHOW
-        if (preg_match('/^[\n\r\s\t]*(select|show)/is', $sql)) {
+        // Retorno em um array associadtivo quando a Query for um SELECT ou um SHOW ou um SELECT iniciado por WITH
+        if (preg_match('/^[\n\r\s\t]*(select|show|with)/is', $sql)) {
             return empty($class)
                 ? $query->fetchAll(PDO::FETCH_ASSOC)
                 : $query->fetchAll(PDO::FETCH_CLASS, $class);
