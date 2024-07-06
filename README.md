@@ -2,6 +2,8 @@
 
 > **DEPRECATED!** Utilize no lugar [szagot/helper](https://github.com/szagot/helper)
 
+---
+
 Classes para Conexão e Consulta ao Banco de Dados MySQL
 
 - <b>Connection</b>: Efetua a Conexão ao Banco de Dados usando PDO
