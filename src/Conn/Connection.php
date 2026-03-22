@@ -60,8 +60,7 @@ class Connection
                         $mysqlInitCommand            => 'SET NAMES UTF8',
                         // Recepciona os erros com PDOException
                         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                        // Mantém aberta a Conexão com o Banco de Dados, se possível
-                        PDO::ATTR_PERSISTENT         => true,
+                        PDO::ATTR_PERSISTENT         => false,
                     ]);
             }
 
