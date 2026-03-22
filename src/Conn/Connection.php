@@ -16,8 +16,8 @@
 
 namespace Sz\Conn;
 
-use \PDOException,
-    \PDO;
+use \PDOException;
+use \PDO;
 
 class Connection
 {
@@ -48,12 +48,16 @@ class Connection
                         PDO::ATTR_PERSISTENT => true,
                     ]);
             } else {
+                // Ajuste para versões mais recentes
+                $mysqlInitCommand = class_exists('\Pdo\Mysql') 
+                    ? \Pdo\Mysql::ATTR_INIT_COMMAND 
+                    : PDO::MYSQL_ATTR_INIT_COMMAND;
                 $this->conn = new PDO("mysql:host={$host};dbname={$db};charset=utf8", $user, $pass,
                     [
                         // Garante a conversão par UTF-8
                         // É necessário que o banco de dados também seja criado com UTF-8 e cada tabela com COLLATE='utf8_general_ci'
                         // EX.: CREATE DATABASE nome_bd CHARACTER SET UTF8;
-                        PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES UTF8',
+                        $mysqlInitCommand            => 'SET NAMES UTF8',
                         // Recepciona os erros com PDOException
                         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                         // Mantém aberta a Conexão com o Banco de Dados, se possível
