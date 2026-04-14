@@ -199,6 +199,11 @@ class Query
                 'params' => $params,
             ],
         ];
+
+        // Garante que o array tenha apenas os últimos 10 elementos
+        if (count(self::$log) > 10) {
+            array_shift(self::$log); 
+        }
     }
 
     /**
